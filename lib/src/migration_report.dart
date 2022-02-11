@@ -1,69 +1,90 @@
 import 'package:meta/meta.dart';
 
+/// Migration result values used to indicate migration results
 enum MigrationResult {
+  /// Migration was successful
   successful,
+
+  /// Migration failed
   failed,
+
+  /// Migration was skipped because it was unnecessary
   skipped,
-  unknown,
 }
 
+/// Extension on [MigrationResult] to polyfill the [name]
 extension MigrationResultExtension on MigrationResult {
+  /// Get the name of the result. Used for encoding/decoding.
   String get name {
     switch (this) {
       case MigrationResult.successful:
         return "successful";
       case MigrationResult.failed:
         return "failed";
-      case MigrationResult.unknown:
-        return "unknown";
       case MigrationResult.skipped:
         return "skipped";
     }
   }
 }
 
+/// Parses the name of a [MigrationResult] to a [MigrationResult]
 MigrationResult parseMigrationResult(String? value) {
   if (value == null || value.isEmpty) {
-    return MigrationResult.unknown;
+    return MigrationResult.skipped;
   }
 
   return MigrationResult.values.singleWhere((enumValue) => enumValue.name == value);
 }
 
+/// Migration report containing the id, status and when it was executed (in UTC)
 @immutable
 class MigrationReport {
-  const MigrationReport({
+  /// Create a new [MigrationReport]
+  /// If the [result] is [MigrationResult.failed], then the [errorMessage] is expected.
+  const MigrationReport._({
     required this.migrationId,
     required this.executedOn,
     required this.result,
     this.errorMessage,
   });
 
-  factory MigrationReport.withResult({required String migrationId, required MigrationResult result}) => MigrationReport(
+  /// Create a new report for the given [result]
+  factory MigrationReport.withResult({required String migrationId, required MigrationResult result}) =>
+      MigrationReport._(
         migrationId: migrationId,
         executedOn: DateTime.now().toUtc(),
         result: result,
       );
 
-  factory MigrationReport.failed({required String migrationId, required String errorMessage}) => MigrationReport(
+  /// Create a report for a failed migration
+  factory MigrationReport.failed({required String migrationId, required String errorMessage}) => MigrationReport._(
         migrationId: migrationId,
         executedOn: DateTime.now().toUtc(),
         result: MigrationResult.failed,
         errorMessage: errorMessage,
       );
 
-  factory MigrationReport.decode(dynamic json) => MigrationReport(
+  /// Decode a report from json
+  factory MigrationReport.decode(Map<String, Object?> json) => MigrationReport._(
         migrationId: json["migrationId"]!.toString(),
         executedOn: DateTime.parse(json["executedOn"]!.toString()),
         result: parseMigrationResult(json["result"]?.toString()),
         errorMessage: json["errorMessage"]?.toString(),
       );
 
+  /// The unique if of the migration
   final String migrationId;
+
+  /// The date and time of execution in UTC
   final DateTime executedOn;
+
+  /// The result of the migration
   final MigrationResult result;
+
+  /// The error message of the migration failed
   final String? errorMessage;
 
+  /// Encode the report in json format
   Map<String, Object?> encode() => {
         "migrationId": migrationId,
         "executedOn": executedOn.toIso8601String(),

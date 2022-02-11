@@ -5,35 +5,48 @@ import 'package:path_provider/path_provider.dart';
 
 import 'migration_report.dart';
 
+/// A storage used to read and store the [MigrationReport]s
 abstract class Storage {
+  /// Get all [MigrationReport]s
   Future<List<MigrationReport>> read();
 
-  Future<void> write(List<MigrationReport> reports);
+  /// Store the (new) [reports]
+  Future<void> store(List<MigrationReport> reports);
 }
 
+/// [Storage] implementation that uses a [File]
 class FileStorage implements Storage {
+  /// Create a file storage
+  ///
+  /// By default [async] is true, which means write actions are not awaited.
+  /// Setting [async] to false means write actions are awaited.
+  ///
+  /// By default the [directory] is set to "journey".
   FileStorage({
-    this.async = true,
+    bool async = true,
     String directory = "journey",
-  }) : _directory = directory;
+  })  : _async = async,
+        _directory = directory;
 
-  final bool async;
-
-  Future<String> get rootDirectory async =>
-      _rootDirectory ??= (await getApplicationDocumentsDirectory()).path + "/$_directory";
+  final bool _async;
 
   final String _directory;
+
   String? _rootDirectory;
+
   List<MigrationReport>? _reports;
+
+  Future<String> get _onDeviceDirectory async =>
+      _rootDirectory ??= (await getApplicationDocumentsDirectory()).path + "/$_directory";
 
   @override
   Future<List<MigrationReport>> read() async {
-    _reports = await _readAndParse(await rootDirectory);
+    _reports = await _readAndParse(await _onDeviceDirectory);
     return _reports!;
   }
 
   @override
-  Future<void> write(List<MigrationReport> reports) async {
+  Future<void> store(List<MigrationReport> reports) async {
     if (_reports == null) {
       await read();
     }
@@ -43,10 +56,10 @@ class FileStorage implements Storage {
 
     _reports = [...currentReports, ...reports];
 
-    if (async) {
-      _parseAndWrite(reports: _reports!, rootDirectory: await rootDirectory);
+    if (_async) {
+      _parseAndWrite(reports: _reports!, rootDirectory: await _onDeviceDirectory);
     } else {
-      await _parseAndWrite(reports: _reports!, rootDirectory: await rootDirectory);
+      await _parseAndWrite(reports: _reports!, rootDirectory: await _onDeviceDirectory);
     }
   }
 
@@ -58,7 +71,9 @@ class FileStorage implements Storage {
       content = "[]";
     }
 
-    return (jsonDecode(content) as List<dynamic>).map((element) => MigrationReport.decode(element)).toList();
+    return (jsonDecode(content) as List<dynamic>)
+        .map((element) => MigrationReport.decode(element as Map<String, Object?>))
+        .toList();
   }
 
   Future<void> _parseAndWrite({
