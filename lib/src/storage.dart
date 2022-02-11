@@ -12,18 +12,30 @@ abstract class Storage {
   Future<void> write(List<MigrationReport> reports);
 }
 
-class AsyncFileStorage implements Storage {
+class FileStorage implements Storage {
+  FileStorage({this.async = true});
+
+  final bool async;
+
+  String? _rootDirectory;
+
+  Future<String> get rootDirectory async => _rootDirectory ??= (await getApplicationDocumentsDirectory()).path;
+
   @override
   Future<List<MigrationReport>> read() async {
-    return await _readAndParse(await _rootDirectory);
+    return await _readAndParse(await rootDirectory);
   }
 
   @override
   Future<void> write(List<MigrationReport> reports) async {
-    compute(_parseAndWrite, _WriteReportsArguments(reports: reports, rootDirectory: await _rootDirectory));
-  }
+    final arguments = _WriteReportsArguments(reports: reports, rootDirectory: await rootDirectory);
 
-  Future<String> get _rootDirectory async => (await getApplicationDocumentsDirectory()).path;
+    if (async) {
+      compute(_parseAndWrite, arguments);
+    } else {
+      await _parseAndWrite(arguments);
+    }
+  }
 
   static Future<List<MigrationReport>> _readAndParse(String rootDirectory) async {
     final file = await _reportsFile(rootDirectory);

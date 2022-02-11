@@ -7,7 +7,7 @@ class Journey {
     required List<Migration> migrations,
     Storage? storage,
   })  : _migrations = migrations,
-        _storage = storage ?? AsyncFileStorage();
+        _storage = storage ?? FileStorage();
 
   final List<Migration> _migrations;
   final Storage _storage;
@@ -27,7 +27,7 @@ class Journey {
       }
     }
 
-    _storage.write(reports);
+    await _storage.write(reports);
 
     return reports;
   }

@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:journey/journey.dart';
-import 'package:watcher/watcher.dart';
+import 'package:journey/src/storage.dart';
 
 void main() {
   group("$Journey", () {
@@ -30,26 +30,8 @@ void main() {
     });
 
     Future<List<MigrationReport>> runJourney({required List<Migration> migrations}) async {
-      final journey = Journey(migrations: migrations);
-
-      final file = File("./test/journey/reports.json");
-      if (!file.existsSync()) {
-        file.createSync(recursive: true);
-      }
-
-      final watcher = FileWatcher(file.path);
-
-      final completer = Completer();
-      watcher.events.where((event) => event.type == ChangeType.MODIFY).take(1).listen((event) {
-        completer.complete();
-      });
-
-      final reports = await journey.migrate();
-
-      // Wait to let the async write action run
-      await completer.future.timeout(const Duration(seconds: 5));
-
-      return reports;
+      final journey = Journey(migrations: migrations, storage: FileStorage(async: false));
+      return await journey.migrate();
     }
 
     group("when running migrations for the first time", () {

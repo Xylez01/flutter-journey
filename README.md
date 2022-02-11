@@ -2,6 +2,7 @@ Todo:
 [ ] FileStorage with `async`
 [ ] As soon as a `Migration` has run, store its report (to cover early app kills)
 [ ] Benchmark tests
+[ ] Update license
 
 TODO: Put a short description of the package here that helps potential users
 know whether this package might be useful for them.
