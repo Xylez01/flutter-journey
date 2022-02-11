@@ -1,7 +1,7 @@
 # Journey 
 
 As soon as your app is published it goes on this wild journey and likely receives new interesting features to benefit
-your users. A long the way there will be times when you need to run one-time migrations to prepare for these exciting
+your users. Along the way there will be times when you need to run one-time migrations to prepare for these exciting
 new features!
 
 This package helps you run one-time migrations in your app incrementally, while trying to reduce impact on app start-up
@@ -23,7 +23,7 @@ dependencies:
 
 ## Usage
 
-Create Migration implementations for the all the migrations in your app:
+Create migration implementations for the all the migrations in your app:
 
 ```dart
 class MigrateUserModelToHaveMultipleJourneys implements Migration {
