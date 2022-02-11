@@ -1,8 +1,5 @@
 include: package:flutter_lints/flutter.yaml
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
-
 analyzer:
   exclude: [build/**]
   language:
@@ -12,7 +9,6 @@ analyzer:
 
 linter:
   rules:
-    - package_api_docs
     - sort_constructors_first
     - sort_unnamed_constructors_first
     - prefer_relative_imports
