@@ -41,13 +41,13 @@ class MigrationReport {
 
   factory MigrationReport.withResult({required String migrationId, required MigrationResult result}) => MigrationReport(
         migrationId: migrationId,
-        executedOn: DateTime.now(),
+        executedOn: DateTime.now().toUtc(),
         result: result,
       );
 
   factory MigrationReport.failed({required String migrationId, required String errorMessage}) => MigrationReport(
         migrationId: migrationId,
-        executedOn: DateTime.now(),
+        executedOn: DateTime.now().toUtc(),
         result: MigrationResult.failed,
         errorMessage: errorMessage,
       );

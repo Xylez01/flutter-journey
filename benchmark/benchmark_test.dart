@@ -55,12 +55,12 @@ void main() {
       await journey.migrate();
     }
 
-    group("with FileStorage(async: true)", () {
+    group("with FileStorage(async: false)", () {
       test("execute benchmark", () async {
         final stopwatch = Stopwatch()..start();
 
         for (var count = 0; count < iterations; count++) {
-          await runJourney(async: true, count: count);
+          await runJourney(async: false, count: count);
         }
 
         stopwatch.stop();
@@ -72,12 +72,12 @@ void main() {
       tearDown(() => cleanUp());
     });
 
-    group("with FileStorage(async: false)", () {
+    group("with FileStorage(async: true)", () {
       test("execute benchmark", () async {
         final stopwatch = Stopwatch()..start();
 
         for (var count = 0; count < iterations; count++) {
-          await runJourney(async: false, count: count);
+          await runJourney(async: true, count: count);
         }
 
         stopwatch.stop();

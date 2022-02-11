@@ -25,9 +25,9 @@ class Journey {
       } on Exception catch (exception) {
         reports.add(MigrationReport.failed(migrationId: migration.id, errorMessage: exception.toString()));
       }
-    }
 
-    await _storage.write(reports);
+      await _storage.write(reports);
+    }
 
     return reports;
   }

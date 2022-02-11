@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'migration_report.dart';
@@ -13,34 +12,46 @@ abstract class Storage {
 }
 
 class FileStorage implements Storage {
-  FileStorage({this.async = true, this.directory = "journey"});
+  FileStorage({
+    this.async = true,
+    String directory = "journey",
+  }) : _directory = directory;
 
   final bool async;
-  final String directory;
-
-  String? _rootDirectory;
 
   Future<String> get rootDirectory async =>
-      _rootDirectory ??= (await getApplicationDocumentsDirectory()).path + "/$directory";
+      _rootDirectory ??= (await getApplicationDocumentsDirectory()).path + "/$_directory";
+
+  final String _directory;
+  String? _rootDirectory;
+  List<MigrationReport>? _reports;
 
   @override
   Future<List<MigrationReport>> read() async {
-    return await _readAndParse(await rootDirectory);
+    _reports = await _readAndParse(await rootDirectory);
+    return _reports!;
   }
 
   @override
   Future<void> write(List<MigrationReport> reports) async {
-    final arguments = _WriteReportsArguments(reports: reports, rootDirectory: await rootDirectory);
+    if (_reports == null) {
+      await read();
+    }
+
+    final currentReports = _reports!
+      ..removeWhere((report) => reports.any((newReport) => newReport.migrationId == report.migrationId));
+
+    _reports = [...currentReports, ...reports];
 
     if (async) {
-      compute(_parseAndWrite, arguments);
+      _parseAndWrite(reports: _reports!, rootDirectory: await rootDirectory);
     } else {
-      await _parseAndWrite(arguments);
+      await _parseAndWrite(reports: _reports!, rootDirectory: await rootDirectory);
     }
   }
 
-  static Future<List<MigrationReport>> _readAndParse(String rootDirectory) async {
-    final file = await _reportsFile(rootDirectory);
+  Future<List<MigrationReport>> _readAndParse(String rootDirectory) async {
+    final file = await _getReportsFile(rootDirectory);
     var content = await file.readAsString();
 
     if (content.isEmpty) {
@@ -59,14 +70,12 @@ class FileStorage implements Storage {
     ).toList();
   }
 
-  static Future<void> _parseAndWrite(_WriteReportsArguments arguments) async {
-    final currentReports = await _readAndParse(arguments.rootDirectory)
-      ..removeWhere((report) => arguments.reports.any((newReport) => newReport.migrationId == report.migrationId));
-
-    final joinedReports = [...currentReports, ...arguments.reports];
-
+  Future<void> _parseAndWrite({
+    required List<MigrationReport> reports,
+    required String rootDirectory,
+  }) async {
     final json = jsonEncode(
-      joinedReports
+      reports
           .map((report) => {
                 "migrationId": report.migrationId,
                 "executedOn": report.executedOn.toIso8601String(),
@@ -76,11 +85,11 @@ class FileStorage implements Storage {
           .toList(),
     );
 
-    final file = await _reportsFile(arguments.rootDirectory);
+    final file = await _getReportsFile(rootDirectory);
     await file.writeAsString(json, mode: FileMode.write);
   }
 
-  static Future<File> _reportsFile(String rootDirectory) async {
+  Future<File> _getReportsFile(String rootDirectory) async {
     final directory = Directory(rootDirectory);
 
     if (!(await directory.exists())) {
@@ -95,11 +104,4 @@ class FileStorage implements Storage {
 
     return file;
   }
-}
-
-class _WriteReportsArguments {
-  _WriteReportsArguments({required this.reports, required this.rootDirectory});
-
-  final List<MigrationReport> reports;
-  final String rootDirectory;
 }
