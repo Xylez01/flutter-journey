@@ -58,33 +58,14 @@ class FileStorage implements Storage {
       content = "[]";
     }
 
-    return (jsonDecode(content) as List<dynamic>).map(
-      (element) {
-        return MigrationReport(
-          migrationId: element["migrationId"]!.toString(),
-          executedOn: DateTime.parse(element["executedOn"]!.toString()),
-          result: parseMigrationResult(element["result"]?.toString()),
-          errorMessage: element["errorMessage"]?.toString(),
-        );
-      },
-    ).toList();
+    return (jsonDecode(content) as List<dynamic>).map((element) => MigrationReport.decode(element)).toList();
   }
 
   Future<void> _parseAndWrite({
     required List<MigrationReport> reports,
     required String rootDirectory,
   }) async {
-    final json = jsonEncode(
-      reports
-          .map((report) => {
-                "migrationId": report.migrationId,
-                "executedOn": report.executedOn.toIso8601String(),
-                "result": report.result.name,
-                "errorMessage": report.errorMessage,
-              })
-          .toList(),
-    );
-
+    final json = jsonEncode(reports.map((report) => report.encode()).toList());
     final file = await _getReportsFile(rootDirectory);
     await file.writeAsString(json, mode: FileMode.write);
   }

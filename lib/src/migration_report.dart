@@ -52,10 +52,24 @@ class MigrationReport {
         errorMessage: errorMessage,
       );
 
+  factory MigrationReport.decode(dynamic json) => MigrationReport(
+        migrationId: json["migrationId"]!.toString(),
+        executedOn: DateTime.parse(json["executedOn"]!.toString()),
+        result: parseMigrationResult(json["result"]?.toString()),
+        errorMessage: json["errorMessage"]?.toString(),
+      );
+
   final String migrationId;
   final DateTime executedOn;
   final MigrationResult result;
   final String? errorMessage;
+
+  Map<String, Object?> encode() => {
+        "migrationId": migrationId,
+        "executedOn": executedOn.toIso8601String(),
+        "result": result.name,
+        "errorMessage": errorMessage,
+      };
 
   @override
   bool operator ==(Object other) =>
