@@ -10,8 +10,10 @@ void main() {
     const iterations = 1000;
 
     setUp(() {
-      const MethodChannel pathProviderChannel = MethodChannel('plugins.flutter.io/path_provider');
-      const MethodChannel pathProviderMacOSChannel = MethodChannel('plugins.flutter.io/path_provider_macos');
+      const MethodChannel pathProviderChannel =
+          MethodChannel('plugins.flutter.io/path_provider');
+      const MethodChannel pathProviderMacOSChannel =
+          MethodChannel('plugins.flutter.io/path_provider_macos');
 
       handler(MethodCall methodCall) async {
         if (methodCall.method == "getApplicationDocumentsDirectory") {
@@ -33,7 +35,9 @@ void main() {
     void cleanUp() {
       final directory = Directory("./benchmark_out");
       if (directory.existsSync()) {
-        directory.listSync().forEach((entity) => entity.deleteSync(recursive: true));
+        directory
+            .listSync()
+            .forEach((entity) => entity.deleteSync(recursive: true));
       }
 
       directory.deleteSync(recursive: true);

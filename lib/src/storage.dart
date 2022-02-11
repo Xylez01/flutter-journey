@@ -36,8 +36,8 @@ class FileStorage implements Storage {
 
   List<MigrationReport>? _reports;
 
-  Future<String> get _onDeviceDirectory async =>
-      _rootDirectory ??= (await getApplicationDocumentsDirectory()).path + "/$_directory";
+  Future<String> get _onDeviceDirectory async => _rootDirectory ??=
+      (await getApplicationDocumentsDirectory()).path + "/$_directory";
 
   @override
   Future<List<MigrationReport>> read() async {
@@ -52,14 +52,17 @@ class FileStorage implements Storage {
     }
 
     final currentReports = _reports!
-      ..removeWhere((report) => reports.any((newReport) => newReport.migrationId == report.migrationId));
+      ..removeWhere((report) => reports
+          .any((newReport) => newReport.migrationId == report.migrationId));
 
     _reports = [...currentReports, ...reports];
 
     if (_async) {
-      _parseAndWrite(reports: _reports!, rootDirectory: await _onDeviceDirectory);
+      _parseAndWrite(
+          reports: _reports!, rootDirectory: await _onDeviceDirectory);
     } else {
-      await _parseAndWrite(reports: _reports!, rootDirectory: await _onDeviceDirectory);
+      await _parseAndWrite(
+          reports: _reports!, rootDirectory: await _onDeviceDirectory);
     }
   }
 
@@ -72,7 +75,8 @@ class FileStorage implements Storage {
     }
 
     return (jsonDecode(content) as List<dynamic>)
-        .map((element) => MigrationReport.decode(element as Map<String, Object?>))
+        .map((element) =>
+            MigrationReport.decode(element as Map<String, Object?>))
         .toList();
   }
 

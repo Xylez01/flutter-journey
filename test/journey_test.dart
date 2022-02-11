@@ -9,8 +9,10 @@ import 'package:journey/src/storage.dart';
 void main() {
   group("$Journey", () {
     setUp(() {
-      const MethodChannel pathProviderChannel = MethodChannel('plugins.flutter.io/path_provider');
-      const MethodChannel pathProviderMacOSChannel = MethodChannel('plugins.flutter.io/path_provider_macos');
+      const MethodChannel pathProviderChannel =
+          MethodChannel('plugins.flutter.io/path_provider');
+      const MethodChannel pathProviderMacOSChannel =
+          MethodChannel('plugins.flutter.io/path_provider_macos');
 
       handler(MethodCall methodCall) async {
         if (methodCall.method == "getApplicationDocumentsDirectory") {
@@ -29,8 +31,13 @@ void main() {
           .setMockMethodCallHandler(pathProviderMacOSChannel, handler);
     });
 
-    Future<List<MigrationReport>> runJourney({required List<Migration> migrations}) async {
-      final journey = Journey(migrations: migrations, storage: FileStorage(async: false));
+    Future<List<MigrationReport>> runJourney({
+      required List<Migration> migrations,
+    }) async {
+      final journey = Journey(
+        migrations: migrations,
+        storage: FileStorage(async: false),
+      );
       return await journey.migrate();
     }
 
@@ -103,7 +110,12 @@ void main() {
       });
 
       test("then only the faulty migration is reported as failing", () {
-        expect(reports.where((report) => report.result == MigrationResult.failed).length, 1);
+        expect(
+          reports
+              .where((report) => report.result == MigrationResult.failed)
+              .length,
+          equals(1),
+        );
       });
     });
 

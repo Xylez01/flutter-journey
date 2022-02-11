@@ -33,7 +33,8 @@ MigrationResult parseMigrationResult(String? value) {
     return MigrationResult.skipped;
   }
 
-  return MigrationResult.values.singleWhere((enumValue) => enumValue.name == value);
+  return MigrationResult.values
+      .singleWhere((enumValue) => enumValue.name == value);
 }
 
 /// Migration report containing the id, status and when it was executed (in UTC)
@@ -49,7 +50,10 @@ class MigrationReport {
   });
 
   /// Create a new report for the given [result]
-  factory MigrationReport.withResult({required String migrationId, required MigrationResult result}) =>
+  factory MigrationReport.withResult({
+    required String migrationId,
+    required MigrationResult result,
+  }) =>
       MigrationReport._(
         migrationId: migrationId,
         executedOn: DateTime.now().toUtc(),
@@ -57,7 +61,11 @@ class MigrationReport {
       );
 
   /// Create a report for a failed migration
-  factory MigrationReport.failed({required String migrationId, required String errorMessage}) => MigrationReport._(
+  factory MigrationReport.failed({
+    required String migrationId,
+    required String errorMessage,
+  }) =>
+      MigrationReport._(
         migrationId: migrationId,
         executedOn: DateTime.now().toUtc(),
         result: MigrationResult.failed,
@@ -65,7 +73,8 @@ class MigrationReport {
       );
 
   /// Decode a report from json
-  factory MigrationReport.decode(Map<String, Object?> json) => MigrationReport._(
+  factory MigrationReport.decode(Map<String, Object?> json) =>
+      MigrationReport._(
         migrationId: json["migrationId"]!.toString(),
         executedOn: DateTime.parse(json["executedOn"]!.toString()),
         result: parseMigrationResult(json["result"]?.toString()),
@@ -103,7 +112,11 @@ class MigrationReport {
           errorMessage == other.errorMessage;
 
   @override
-  int get hashCode => migrationId.hashCode ^ executedOn.hashCode ^ result.hashCode ^ errorMessage.hashCode;
+  int get hashCode =>
+      migrationId.hashCode ^
+      executedOn.hashCode ^
+      result.hashCode ^
+      errorMessage.hashCode;
 
   @override
   String toString() {
