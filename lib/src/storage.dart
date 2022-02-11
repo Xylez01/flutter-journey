@@ -13,13 +13,15 @@ abstract class Storage {
 }
 
 class FileStorage implements Storage {
-  FileStorage({this.async = true});
+  FileStorage({this.async = true, this.directory = "journey"});
 
   final bool async;
+  final String directory;
 
   String? _rootDirectory;
 
-  Future<String> get rootDirectory async => _rootDirectory ??= (await getApplicationDocumentsDirectory()).path;
+  Future<String> get rootDirectory async =>
+      _rootDirectory ??= (await getApplicationDocumentsDirectory()).path + "/$directory";
 
   @override
   Future<List<MigrationReport>> read() async {
@@ -79,10 +81,10 @@ class FileStorage implements Storage {
   }
 
   static Future<File> _reportsFile(String rootDirectory) async {
-    final directory = Directory("$rootDirectory/journey");
+    final directory = Directory(rootDirectory);
 
     if (!(await directory.exists())) {
-      await directory.create();
+      await directory.create(recursive: true);
     }
 
     final file = File("${directory.path}/reports.json");
