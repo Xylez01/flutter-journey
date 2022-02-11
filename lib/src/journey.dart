@@ -24,6 +24,7 @@ class Journey {
 
   /// Run all [Migration]s that have not been executed for this user
   /// Returns a list of [MigrationReport]s which can be used for analytical purposes.
+  /// The list of [MigrationReport]s only contains the reports of the executed migrations.
   Future<List<MigrationReport>> migrate() async {
     final previousMigrations = (await _storage.read()).map((report) => report.migrationId).toList();
 
