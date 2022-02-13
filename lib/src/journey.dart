@@ -26,13 +26,15 @@ class Journey {
   /// Returns a list of [MigrationReport]s which can be used for analytical purposes.
   /// The list of [MigrationReport]s only contains the reports of the executed migrations.
   Future<List<MigrationReport>> migrate() async {
-    final previousMigrations =
-        (await _storage.read()).map((report) => report.migrationId).toList();
+    final previousMigrations = await _storage.getAll();
+    final previousMigrationIds = previousMigrations
+        .map((report) => report.migrationId)
+        .toList(growable: false);
 
     final reports = <MigrationReport>[];
 
     for (var migration in _migrations
-        .where((migration) => !previousMigrations.contains(migration.id))) {
+        .where((migration) => !previousMigrationIds.contains(migration.id))) {
       try {
         final result = await migration.run();
 
@@ -42,9 +44,9 @@ class Journey {
         reports.add(MigrationReport.failed(
             migrationId: migration.id, errorMessage: exception.toString()));
       }
-
-      await _storage.store(reports);
     }
+
+    await _storage.store([...previousMigrations, ...reports]);
 
     return reports;
   }

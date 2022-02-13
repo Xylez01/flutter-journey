@@ -8,7 +8,7 @@ import 'migration_report.dart';
 /// A storage used to read and store the [MigrationReport]s
 abstract class Storage {
   /// Get all [MigrationReport]s
-  Future<List<MigrationReport>> read();
+  Future<List<MigrationReport>> getAll();
 
   /// Store the (new) [reports]
   Future<void> store(List<MigrationReport> reports);
@@ -40,22 +40,14 @@ class FileStorage implements Storage {
       (await getApplicationDocumentsDirectory()).path + "/$_directory";
 
   @override
-  Future<List<MigrationReport>> read() async {
+  Future<List<MigrationReport>> getAll() async {
     _reports = await _readAndParse(await _onDeviceDirectory);
     return _reports!;
   }
 
   @override
   Future<void> store(List<MigrationReport> reports) async {
-    if (_reports == null) {
-      await read();
-    }
-
-    final currentReports = _reports!
-      ..removeWhere((report) => reports
-          .any((newReport) => newReport.migrationId == report.migrationId));
-
-    _reports = [...currentReports, ...reports];
+    _reports = reports;
 
     if (_async) {
       _parseAndWrite(
