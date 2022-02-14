@@ -1,7 +1,7 @@
 name: journey
 description: This package helps you run one-time migrations in your app incrementally, while trying to reduce impact on app start-up
   time as much as possible.
-version: 1.0.1
+version: 1.1.0
 repository: https://github.com/JordyLangen/flutter-journey
 
 environment:
