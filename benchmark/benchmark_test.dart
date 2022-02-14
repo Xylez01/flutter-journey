@@ -95,32 +95,32 @@ void main() {
   });
 }
 
-class _MigrationOne implements Migration {
+class _MigrationOne extends Migration {
   @override
   String get id => "migration_one";
 
   @override
-  Future<MigrationResult> run() async {
+  Future<MigrationResult> migrate() async {
     return MigrationResult.successful;
   }
 }
 
-class _MigrationTwo implements Migration {
+class _MigrationTwo extends Migration {
   @override
   String get id => "migration_two";
 
   @override
-  Future<MigrationResult> run() async {
+  Future<MigrationResult> migrate() async {
     return MigrationResult.skipped;
   }
 }
 
-class _MigrationThree implements Migration {
+class _MigrationThree extends Migration {
   @override
   String get id => "migration_three";
 
   @override
-  Future<MigrationResult> run() async {
+  Future<MigrationResult> migrate() async {
     return MigrationResult.successful;
   }
 }

@@ -6,5 +6,9 @@ abstract class Migration {
   String get id;
 
   /// Execute the migration and return a [MigrationResult] indicating the result.
-  Future<MigrationResult> run();
+  Future<MigrationResult> migrate();
+
+  /// Revert the migration output of [migrate]
+  /// The [MigrationReport] for this migration will be removed
+  Future<void> rollback() async {}
 }

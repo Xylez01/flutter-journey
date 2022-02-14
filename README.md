@@ -26,21 +26,21 @@ dependencies:
 Create migration implementations for the all the migrations in your app:
 
 ```dart
-class MigrateUserModelToHaveMultipleJourneys implements Migration {
+class MigrateUserModelToHaveMultipleJourneys extends Migration {
   String get id => "migrate_user_model_to_have_multiple_journeys";
 
   @override
-  Future<MigrationResult> run() async {
+  Future<MigrationResult> migrate() async {
     // change the data model of your underlying data structure
     return MigrationResult.successful;
   }
 }
 
-class MigrateTokensToNativeSecureStorage implements Migration {
+class MigrateTokensToNativeSecureStorage extends Migration {
   String get id => "migrate_tokens_to_native_secure_storage";
 
   @override
-  Future<MigrationResult> run() async {
+  Future<MigrationResult> migrate() async {
     // read the tokens from the previous storage, and move them to the secure storage
     return MigrationResult.successful;
   }
@@ -62,4 +62,14 @@ After defining the journey, execute the migrations at an appropriate time in you
 ```dart
 // U can use the reports for analytical purposes
 final reports = await journey.migrate();
+```
+
+If at some point, or for testing, you want to execute migrations again, you can rollback migrations:
+
+```dart
+// rollback the migrations
+await journey.rollback();
+
+// reset all migration reports
+await journey.reset();
 ```
