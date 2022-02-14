@@ -38,6 +38,7 @@ void main() {
         migrations: migrations,
         storage: FileStorage(async: false),
       );
+
       return await journey.migrate();
     }
 
@@ -75,6 +76,48 @@ void main() {
 
         test("then no migrations are executed", () {
           expect(reports.length, 0);
+        });
+      });
+
+      group(
+          "and when migrations are rolled back, after which migrations are executed again",
+          () {
+        setUp(() async {
+          await Journey(
+            migrations: [_MigrationOne()],
+            storage: FileStorage(async: false),
+          ).rollback();
+
+          reports = await runJourney(migrations: [
+            _MigrationOne(),
+            _MigrationTwo(),
+          ]);
+        });
+
+        test("then the migrations which got rolled back are executed again",
+            () {
+          expect(reports.length, 1);
+        });
+
+        test("then there is a report for $_MigrationOne", () {
+          expect(reports[0].migrationId, equals("migration_one"));
+          expect(reports[0].result, equals(MigrationResult.successful));
+        });
+      });
+
+      group("and when the journey is reset", () {
+        setUp(() async {
+          await Journey(migrations: [], storage: FileStorage(async: false))
+              .reset();
+
+          reports = await runJourney(migrations: [
+            _MigrationOne(),
+            _MigrationTwo(),
+          ]);
+        });
+
+        test("then all migrations are executed again", () {
+          expect(reports.length, 2);
         });
       });
 
@@ -135,42 +178,42 @@ void main() {
   });
 }
 
-class _MigrationOne implements Migration {
+class _MigrationOne extends Migration {
   @override
   String get id => "migration_one";
 
   @override
-  Future<MigrationResult> run() async {
+  Future<MigrationResult> migrate() async {
     return MigrationResult.successful;
   }
 }
 
-class _MigrationTwo implements Migration {
+class _MigrationTwo extends Migration {
   @override
   String get id => "migration_two";
 
   @override
-  Future<MigrationResult> run() async {
+  Future<MigrationResult> migrate() async {
     return MigrationResult.skipped;
   }
 }
 
-class _MigrationThree implements Migration {
+class _MigrationThree extends Migration {
   @override
   String get id => "migration_three";
 
   @override
-  Future<MigrationResult> run() async {
+  Future<MigrationResult> migrate() async {
     return MigrationResult.successful;
   }
 }
 
-class _FaultyMigration implements Migration {
+class _FaultyMigration extends Migration {
   @override
   String get id => "faulty_migration";
 
   @override
-  Future<MigrationResult> run() async {
+  Future<MigrationResult> migrate() async {
     throw Exception("ow no");
   }
 }

@@ -36,7 +36,7 @@ class Journey {
     for (var migration in _migrations
         .where((migration) => !previousMigrationIds.contains(migration.id))) {
       try {
-        final result = await migration.run();
+        final result = await migration.migrate();
 
         reports.add(MigrationReport.withResult(
             migrationId: migration.id, result: result));
@@ -50,4 +50,24 @@ class Journey {
 
     return reports;
   }
+
+  /// Rollback the provided migrations. This also means they will be executed again next time [migrate] is called
+  Future<void> rollback() async {
+    final rolledBackMigrationIds = <String>[];
+
+    for (var migration in _migrations) {
+      await migration.rollback();
+      rolledBackMigrationIds.add(migration.id);
+    }
+
+    final reports = (await _storage.getAll())
+        .where((report) =>
+            !rolledBackMigrationIds.any((id) => id == report.migrationId))
+        .toList();
+
+    await _storage.store(reports);
+  }
+
+  /// Revoke all reports, meaning they will be executed again next time [migrate] is called
+  Future<void> reset() async => await _storage.clear();
 }

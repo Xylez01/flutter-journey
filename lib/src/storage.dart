@@ -12,6 +12,9 @@ abstract class Storage {
 
   /// Store the (new) [reports]
   Future<void> store(List<MigrationReport> reports);
+
+  /// Clear the storage, removing all reports
+  Future<void> clear();
 }
 
 /// [Storage] implementation that uses a [File]
@@ -95,5 +98,11 @@ class FileStorage implements Storage {
     }
 
     return file;
+  }
+
+  @override
+  Future<void> clear() async {
+    final file = await _getReportsFile(await _onDeviceDirectory);
+    await file.writeAsString("[]");
   }
 }

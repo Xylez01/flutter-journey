@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:journey/journey.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'migrations.dart';
@@ -27,13 +24,10 @@ class JourneyExampleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = sharedPreferences.getString("style") ?? "purple";
-
     return MaterialApp(
       title: 'Journey example app',
       theme: ThemeData(
-        primarySwatch:
-            style == "purple" ? Colors.deepPurple : Colors.deepOrange,
+        primarySwatch: Colors.blue,
       ),
       home: Scaffold(
         body: JourneyHomepage(
@@ -65,8 +59,6 @@ class _JourneyHomepageState extends State<JourneyHomepage> {
     final backgroundImage =
         widget.sharedPreferences.getString("background_image") ??
             "background-purple.jpg";
-
-    final style = widget.sharedPreferences.getString("style") ?? "purple";
 
     final migrations = {
       "Migrate to new style": MigrateToNewBackgroundImage(
@@ -132,20 +124,9 @@ class _JourneyHomepageState extends State<JourneyHomepage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: ElevatedButton(
-                      child: const Text("Reset"),
+                      child: const Text("Rollback"),
                       onPressed: () async {
-                        await widget.sharedPreferences.clear();
-
-                        final documentDirectory =
-                            await getApplicationDocumentsDirectory();
-
-                        final reportsFile = File(
-                            "${documentDirectory.path}/journey/reports.json");
-
-                        if (reportsFile.existsSync()) {
-                          reportsFile.deleteSync();
-                        }
-
+                        await _journey.rollback();
                         setState(() {});
                       },
                     ),

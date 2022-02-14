@@ -10,13 +10,21 @@ class MigrateToNewBackgroundImage extends Migration {
   String get id => runtimeType.toString();
 
   @override
-  Future<MigrationResult> run() async {
+  Future<MigrationResult> migrate() async {
     await sharedPreferences.setString(
       "background_image",
       "background-yellow.jpg",
     );
 
     return MigrationResult.successful;
+  }
+
+  @override
+  Future<void> rollback() async {
+    await sharedPreferences.setString(
+      "background_image",
+      "background-purple.jpg",
+    );
   }
 }
 
@@ -29,17 +37,20 @@ class MigrateToNewStyle extends Migration {
   String get id => runtimeType.toString();
 
   @override
-  Future<MigrationResult> run() async {
-    await sharedPreferences.setString(
-      "style",
-      "orange",
-    );
-
+  Future<MigrationResult> migrate() async {
     await sharedPreferences.setString(
       "app_name",
       "JOURNEY 🤩",
     );
 
     return MigrationResult.successful;
+  }
+
+  @override
+  Future<void> rollback() async {
+    await sharedPreferences.setString(
+      "app_name",
+      "Journey",
+    );
   }
 }
