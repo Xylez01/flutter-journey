@@ -1,3 +1,7 @@
+## 1.1.1
+
+* Slight performance improvement for `journey.migrate`
+
 ## 1.1.0
 
 * Add `rollback` and `reset` api to rollback or reset migrations, so they can be executed again.

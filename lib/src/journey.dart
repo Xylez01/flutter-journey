@@ -33,8 +33,11 @@ class Journey {
 
     final reports = <MigrationReport>[];
 
-    for (var migration in _migrations
-        .where((migration) => !previousMigrationIds.contains(migration.id))) {
+    final migrations = _migrations
+        .where((migration) => !previousMigrationIds.contains(migration.id))
+        .toList();
+
+    for (var migration in migrations) {
       try {
         final result = await migration.migrate();
 
