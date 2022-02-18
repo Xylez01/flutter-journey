@@ -11,6 +11,20 @@ time as much as possible.
 
 Run incremental migrations.
 
+
+### How does Journey work?
+
+```mermaid
+flowchart LR
+    start[Start app] --> configure[Configure Journey]
+    configure --> migrate["migrate()"]
+    migrate --> read{Any new migrations?}
+    read --> execute[Execute new migrations]
+    read --> continue[Continue]
+    execute -.->|async| persist[Persist migration reports]
+    execute --> continue
+```
+
 ## Getting started
 
 To use Journey, you will need to include this package in your pubspec:
