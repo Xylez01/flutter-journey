@@ -15,14 +15,14 @@ Run incremental migrations.
 ### How does Journey work?
 
 ```mermaid
-flowchart LR
+flowchart
     start[Start app] --> configure[Configure Journey]
     configure --> migrate["migrate()"]
     migrate --> read{Any new migrations?}
     read -->|yes| execute[Execute new migrations]
     read -->|no| continue[Continue]
     execute -.->|async| persist[Persist migration reports]
-    execute --> continue
+    execute --> continue    
 ```
 
 ## Getting started
