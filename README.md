@@ -19,8 +19,8 @@ flowchart LR
     start[Start app] --> configure[Configure Journey]
     configure --> migrate["migrate()"]
     migrate --> read{Any new migrations?}
-    read --> execute[Execute new migrations]
-    read --> continue[Continue]
+    read -->|yes| execute[Execute new migrations]
+    read -->|no| continue[Continue]
     execute -.->|async| persist[Persist migration reports]
     execute --> continue
 ```
