@@ -7,10 +7,16 @@ new features!
 This package helps you run one-time migrations in your app incrementally, while trying to reduce impact on app start-up
 time as much as possible.
 
+If you need to run a one-time "something" (called a migration in this context) in your app, you can use this library for that.
+
+Migrations can be executed in one batch, or in groups by creating multiple journeys.
+
+
 ## Features
 
-Run incremental migrations.
-
+* Run incremental migrations.
+* Optionally implement a rollback mechanic for migrations.
+* Reset `Journey` so all migrations will be executed again.
 
 ### How does Journey work?
 
