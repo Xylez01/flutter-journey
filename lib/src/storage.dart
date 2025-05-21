@@ -63,7 +63,7 @@ class FileStorage implements Storage {
 
   Future<List<MigrationReport>> _readAndParse(String rootDirectory) async {
     final file = await _getReportsFile(rootDirectory);
-    var content = await file.readAsString();
+    var content = file.readAsStringSync();
 
     if (content.isEmpty) {
       content = "[]";
@@ -80,21 +80,21 @@ class FileStorage implements Storage {
     required String rootDirectory,
   }) async {
     final json = jsonEncode(reports.map((report) => report.encode()).toList());
-    final file = await _getReportsFile(rootDirectory);
+    final file = _getReportsFile(rootDirectory);
     await file.writeAsString(json, mode: FileMode.write);
   }
 
-  Future<File> _getReportsFile(String rootDirectory) async {
+  File _getReportsFile(String rootDirectory) {
     final directory = Directory(rootDirectory);
 
-    if (!(await directory.exists())) {
-      await directory.create(recursive: true);
+    if (!directory.existsSync()) {
+      directory.createSync(recursive: true);
     }
 
     final file = File("${directory.path}/reports.json");
 
-    if (!(await file.exists())) {
-      await file.create();
+    if (!file.existsSync()) {
+      file.createSync();
     }
 
     return file;
@@ -103,6 +103,6 @@ class FileStorage implements Storage {
   @override
   Future<void> clear() async {
     final file = await _getReportsFile(await _onDeviceDirectory);
-    await file.writeAsString("[]");
+    file.writeAsStringSync("[]");
   }
 }
