@@ -1,3 +1,7 @@
+## 1.2.0
+
+* Made internal storage mechanics synchronous where possible
+
 ## 1.1.1
 
 * Slight performance improvement for `journey.migrate`
